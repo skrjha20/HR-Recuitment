@@ -1,3 +1,4 @@
+import numpy as np
 import pandas as pd
 from sklearn.impute import KNNImputer
 from sklearn.preprocessing import MinMaxScaler
@@ -17,8 +18,13 @@ def impute_experience(df, cat_var):
     imputer = KNNImputer()
     df1_imputed = imputer.fit_transform(df1)
     df1_imputed = pd.DataFrame(df1_imputed, index=df1.index, columns=df1.columns)
+
+    bins = np.linspace(0, 25, 6)
+    labels = ['exp_one', 'exp_two', 'exp_three', 'exp_four', 'exp_five']
+    df1_imputed['exp_bins'] = pd.cut(df1_imputed['experience'], bins=bins, labels=labels)
+    df2 = pd.get_dummies(df1_imputed['exp_bins'])
     df = df.drop(['experience'], axis=1)
-    df = pd.concat([df, df1_imputed['experience']], axis=1)
+    df = pd.concat([df, df2], axis=1)
     return df
 
 def impute_last_new_job(df, cat_var):
@@ -29,8 +35,13 @@ def impute_last_new_job(df, cat_var):
     imputer = KNNImputer()
     df1_imputed = imputer.fit_transform(df1)
     df1_imputed = pd.DataFrame(df1_imputed, index=df1.index, columns=df1.columns)
+
+    bins = np.linspace(-1, 5, 7)
+    labels = ['lnj_zero', 'lnj_one', 'lnj_two', 'lnj_three', 'lnj_four', 'lnj_five']
+    df1_imputed['lnj_bins'] = pd.cut(df1_imputed['last_new_job'], bins=bins, labels=labels)
+    df2 = pd.get_dummies(df1_imputed['lnj_bins'])
     df = df.drop(['last_new_job'], axis=1)
-    df = pd.concat([df, df1_imputed['last_new_job']], axis=1)
+    df = pd.concat([df, df2], axis=1)
     return df
 
 def find_category_mappings(df, variable):
